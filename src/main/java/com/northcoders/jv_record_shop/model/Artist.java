@@ -22,7 +22,7 @@ public class Artist {
     @Column(updatable = false, nullable = false)
     Long id;
 
-    @Column
+    @Column (nullable = false)
     String name;
 
 }

@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -30,5 +32,7 @@ public class Album {
     @Enumerated(EnumType.STRING) // Puts the enum in text form in the database
     Genre genre;
 
+    @Column(nullable = false)
+    LocalDate releaseDate; // format YYYY-MM-dd
 
 }

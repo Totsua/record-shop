@@ -3,6 +3,7 @@ package com.northcoders.jv_record_shop.controller;
 import com.northcoders.jv_record_shop.model.Album;
 import com.northcoders.jv_record_shop.service.RecordShopServiceLayer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +18,7 @@ public class RecordShopController {
 
     @GetMapping
     public ResponseEntity<List<Album>> getAllAlbums(){
-
-        return null;
+        return new ResponseEntity<>(recordShopService.getAllAlbums(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

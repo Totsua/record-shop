@@ -22,7 +22,7 @@ public class Album {
     @Column(nullable = false)
     String name;
 
-    @Column(nullable = false)
+    @JoinColumn
     @ManyToOne(cascade = CascadeType.ALL,optional = false)
     Artist artist;
 

@@ -1,10 +1,7 @@
 package com.northcoders.jv_record_shop.model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,13 +19,15 @@ public class Album {
     @Column(updatable = false,nullable = false)
     long id;
 
-    @Column
+    @Column(nullable = false)
     String name;
 
-    @Column
+    @Column(nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL,optional = false)
     Artist artist;
 
-    @Column
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING) // Puts the enum in text form in the database
     Genre genre;
 
 

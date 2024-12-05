@@ -47,7 +47,7 @@ class RecordShopControllerTests {
 
     @Test
     @DisplayName("GET all the albums in the database")
-    void getAllAlbums() throws Exception {
+    void getAllAlbums_Test() throws Exception {
         Artist testArtist = new Artist(1L,"THE Artist");
 
         Album testAlbum1 = new Album(1L,"testOne",testArtist,Genre.JAZZ,LocalDate.now());
@@ -67,7 +67,5 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value("testTwo"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].genre").value("UNKNOWN"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].name").value("testThree"));
-
-
     }
 }

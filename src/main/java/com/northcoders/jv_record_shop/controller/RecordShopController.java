@@ -23,8 +23,7 @@ public class RecordShopController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Album> getAlbumById(@PathVariable String id){
-
-        return null;
+        return new ResponseEntity<>(recordShopService.getAlbumById(id),HttpStatus.OK);
     }
 
     @PostMapping

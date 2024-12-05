@@ -71,4 +71,20 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].price").value("5.0"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].releaseDate").value("05-12-2024"));
     }
+
+    @Test
+    @DisplayName("Get Album by the id given a valid id")
+    void getAlbumById_ValidIdTest() throws Exception{
+        Artist testArtist = new Artist(1, "THE Artist");
+        Album testAlbum = new Album(1, "testOne", testArtist, Genre.JAZZ, LocalDate.now(),5,10.50);
+
+        Mockito.when(mockRecordShopServiceImpl.getAlbumById("1")).thenReturn(testAlbum);
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.get("/api/v1/recordshop/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("JAZZ"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("05-12-2024"));
+    }
 }

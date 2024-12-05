@@ -20,7 +20,7 @@ public class Artist {
     @Id
     @GeneratedValue
     @Column(updatable = false, nullable = false)
-    Long id;
+    long id;
 
     @Column (nullable = false)
     String name;

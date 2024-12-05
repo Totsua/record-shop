@@ -2,6 +2,8 @@ package com.northcoders.jv_record_shop.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.northcoders.jv_record_shop.exception.APIExceptionHandler;
+import com.northcoders.jv_record_shop.exception.ItemNotFoundException;
 import com.northcoders.jv_record_shop.model.Album;
 import com.northcoders.jv_record_shop.model.Artist;
 import com.northcoders.jv_record_shop.model.Genre;
@@ -41,7 +43,9 @@ class RecordShopControllerTests {
 
     @BeforeEach
     public void setup() {
-        mockMvcController = MockMvcBuilders.standaloneSetup(recordShopController).build();
+        mockMvcController = MockMvcBuilders.standaloneSetup(recordShopController)
+                .setControllerAdvice(new APIExceptionHandler())
+                .build();
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
     }
@@ -86,5 +90,17 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("JAZZ"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("05-12-2024"));
+    }
+
+
+    @Test
+    @DisplayName("getAlbumById throws an error 404 for an invalid Id")
+    void getAlbumById_InvalidIdInput() throws Exception{
+
+        Mockito.when(mockRecordShopServiceImpl.getAlbumById("1"))
+                .thenThrow(new ItemNotFoundException("1 is not a valid Id"));
+
+        this.mockMvcController.perform(MockMvcRequestBuilders.get("/api/v1/recordshop/1"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 }

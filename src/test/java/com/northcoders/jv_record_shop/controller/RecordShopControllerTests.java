@@ -62,11 +62,11 @@ class RecordShopControllerTests {
         Artist testArtist = new Artist(1L, "THE Artist");
 
         Album testAlbum1 = new Album(1L, "testOne", testArtist, Genre.JAZZ.toString(),
-                LocalDate.of(2024,12,5),5,10.50);
+                LocalDate.of(2024, 12, 5), 5, 10.50);
         Album testAlbum2 = new Album(2L, "testTwo", testArtist, Genre.POP.toString(),
-                LocalDate.of(2024,12,5),2,12.12);
+                LocalDate.of(2024, 12, 5), 2, 12.12);
         Album testAlbum3 = new Album(3L, "testThree", testArtist, Genre.UNKNOWN.toString(),
-                LocalDate.of(2024,12,5),9,5.0);
+                LocalDate.of(2024, 12, 5), 9, 5.0);
 
         List<Album> albumList = List.of(testAlbum1, testAlbum2, testAlbum3);
 
@@ -87,10 +87,10 @@ class RecordShopControllerTests {
 
     @Test
     @DisplayName("Get Album by the id given a valid id")
-    void getAlbumById_ValidIdTest() throws Exception{
+    void getAlbumById_ValidIdTest() throws Exception {
         Artist testArtist = new Artist(1, "THE Artist");
         Album testAlbum = new Album(1, "testOne", testArtist, Genre.JAZZ.toString(),
-                LocalDate.of(2000,10,10),5,10.50);
+                LocalDate.of(2000, 10, 10), 5, 10.50);
 
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("1")).thenReturn(testAlbum);
 
@@ -105,7 +105,7 @@ class RecordShopControllerTests {
 
     @Test
     @DisplayName("getAlbumById throws an error 404 for an invalid Id")
-    void getAlbumById_InvalidIdInput() throws Exception{
+    void getAlbumById_InvalidIdInput() throws Exception {
 
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("1"))
                 .thenThrow(new ItemNotFoundException("1 is not a valid Id"));
@@ -129,14 +129,14 @@ class RecordShopControllerTests {
     void addAlbum_ValidTest() throws Exception {
 
         // Assigning Artist and Album objects
-        Artist testArtist = new Artist(1,"THE Artist");
+        Artist testArtist = new Artist(1, "THE Artist");
         Album testAlbum = Album.builder()
                 .name("TestAlbumOne")
                 .genre(Genre.RAP.toString())
                 .stock(131)
                 .artist(testArtist)
                 .price(10.00)
-                .releaseDate(LocalDate.of(2024,12,5))
+                .releaseDate(LocalDate.of(2024, 12, 5))
                 .build();
 
         // Mapping the object to a JSON
@@ -147,21 +147,41 @@ class RecordShopControllerTests {
 
 
         this.mockMvcController.perform(
-                MockMvcRequestBuilders.post("/api/v1/recordshop")
-                        .contentType(MediaType.APPLICATION_JSON).content(testJSON))
+                        MockMvcRequestBuilders.post("/api/v1/recordshop")
+                                .contentType(MediaType.APPLICATION_JSON).content(testJSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("RAP"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("05-12-2024"));
     }
 
-    // adding album but including an id -> should still create the album but not with that id
+    @Test
+    @DisplayName("AddAlbum returns error 400 for invalid inputs")
+    void addAlbum_InvalidInputsTest() throws Exception {
+
+        String testJSON = "{\"name\":\"\",\"artist\":{\"id\":1},\"genre\":\"E\"," +
+                "\"releaseDate\":\"\",\"stock\":\"-3\",\"price\":\"-5\"}";
+
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.post("/api/v1/recordshop")
+                                .contentType(MediaType.APPLICATION_JSON).content(testJSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("name cannot be blank"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("must be any of Genre {ROCK,HIPHOP,RAP,JAZZ,POP,UNKNOWN}"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.stock").value("stock cannot be negative"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("price cannot be negative, we aren't paying people to take the album"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("releaseDate must contain an entry in format \"dd-MM-yyyy\""))
+                .andExpect(MockMvcResultMatchers.jsonPath("$['artist.name']").value("An artist's name must not be empty"));
+    }
+
+
     @Test
     @DisplayName("AddAlbum returns the created album with an id with a valid input that comes with a different id")
     void addAlbum_WithAnIdTest() throws Exception {
 
         // Assigning Artist and Album objects
-        Artist testArtist = new Artist(1,"THE Artist");
+        Artist testArtist = new Artist(1, "THE Artist");
         Album testAlbum = Album.builder()
                 .id(10)
                 .name("TestAlbumOne")
@@ -169,7 +189,7 @@ class RecordShopControllerTests {
                 .stock(4)
                 .artist(testArtist)
                 .price(10.00)
-                .releaseDate(LocalDate.of(2020,12,6))
+                .releaseDate(LocalDate.of(2020, 12, 6))
                 .build();
 
         // Mapping the object to a JSON
@@ -187,9 +207,6 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("UNKNOWN"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("06-12-2020"));
     }
-    // What about artist, how will we know if the artist is the same or different if they have the same name
-
-
 
 
     @Test
@@ -200,20 +217,20 @@ class RecordShopControllerTests {
 
         String testJSON = mapper.writeValueAsString(testAlbumUpdated);
 
-        Artist testArtist = new Artist(1,"THE Artist");
+        Artist testArtist = new Artist(1, "THE Artist");
         Album testAlbum = Album.builder().id(3)
                 .name("TestAlbumOne")
                 .artist(testArtist)
                 .genre(Genre.HIPHOP.toString())
-                .releaseDate(LocalDate.of(2014,12,12))
-                        .stock(3)
-                                .price(5.0).build();
+                .releaseDate(LocalDate.of(2014, 12, 12))
+                .stock(3)
+                .price(5.0).build();
 
-        Mockito.when(mockRecordShopServiceImpl.updateAlbumDetails("3",testAlbumUpdated)).thenReturn(testAlbum);
+        Mockito.when(mockRecordShopServiceImpl.updateAlbumDetails("3", testAlbumUpdated)).thenReturn(testAlbum);
 
         this.mockMvcController.perform(
-                MockMvcRequestBuilders.patch("/api/v1/recordshop/3")
-                        .contentType(MediaType.APPLICATION_JSON).content(testJSON))
+                        MockMvcRequestBuilders.patch("/api/v1/recordshop/3")
+                                .contentType(MediaType.APPLICATION_JSON).content(testJSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("3"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stock").value("3"))
@@ -230,7 +247,7 @@ class RecordShopControllerTests {
         String testJSON = mapper.writeValueAsString(testAlbumUpdated);
 
 
-        Mockito.when(mockRecordShopServiceImpl.updateAlbumDetails("3",testAlbumUpdated))
+        Mockito.when(mockRecordShopServiceImpl.updateAlbumDetails("3", testAlbumUpdated))
                 .thenThrow(ItemNotFoundException.class);
 
         this.mockMvcController.perform(
@@ -239,7 +256,32 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 
     }
+    @Test
+    @DisplayName("updateAlbumDetails returns error 400 for an invalid inputs")
+    void updateAlbumDetails_InvalidInputValidId() throws Exception {
 
+        String testJSON = "{\"id\":\"1\",\"name\":\"\"}";
+
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/recordshop/1")
+                                .contentType(MediaType.APPLICATION_JSON).content(testJSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("name cannot be blank"));
+
+    }
+    @Test
+    @DisplayName("deleteAlbumByID returns Status 204 for a valid Id")
+    void deleteAlbumByID_ValidId() throws Exception{
+
+
+        Mockito.when(mockRecordShopServiceImpl.deleteAlbumById("1")).thenReturn(true);
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/recordshop/1"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+    }
 
 
 }

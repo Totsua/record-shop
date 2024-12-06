@@ -39,7 +39,8 @@ public class RecordShopController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Album> deleteAlbumByID(@PathVariable String id){
-        return null;
+        boolean isValid = recordShopService.deleteAlbumById(id);
+        return isValid ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.northcoders.jv_record_shop.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.northcoders.jv_record_shop.exception.APIExceptionHandler;
@@ -182,8 +183,39 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("UNKNOWN"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("06-12-2020"));
     }
+    // What about artist, how will we know if the artist is the same or different if they have the same name
 
 
+
+
+    @Test
+    @DisplayName("updateAlbumDetails returns the updated Album when given valid input and id")
+    void updateAlbumDetails_ValidInputs() throws Exception {
+
+        Album testAlbumUpdated = Album.builder().id(3).stock(3).price(5.0).build();
+
+        String testJSON = mapper.writeValueAsString(testAlbumUpdated);
+
+        Artist testArtist = new Artist(1,"THE Artist");
+        Album testAlbum = Album.builder().id(3)
+                .name("TestAlbumOne")
+                .artist(testArtist)
+                .genre(Genre.HIPHOP)
+                .releaseDate(LocalDate.of(2014,12,12))
+                        .stock(3)
+                                .price(5.0).build();
+
+        Mockito.when(mockRecordShopServiceImpl.updateAlbumDetails("3",testAlbumUpdated)).thenReturn(testAlbum);
+
+        this.mockMvcController.perform(
+                MockMvcRequestBuilders.patch("/api/v1/recordshop/3")
+                        .contentType(MediaType.APPLICATION_JSON).content(testJSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("3"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.stock").value("3"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("5.0"));
+
+    }
 
 
 

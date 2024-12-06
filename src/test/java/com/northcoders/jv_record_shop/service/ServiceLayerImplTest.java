@@ -1,11 +1,12 @@
 package com.northcoders.jv_record_shop.service;
 
 
+import com.northcoders.jv_record_shop.exception.InvalidInputException;
+import com.northcoders.jv_record_shop.exception.ItemNotFoundException;
 import com.northcoders.jv_record_shop.model.Album;
 import com.northcoders.jv_record_shop.model.Artist;
 import com.northcoders.jv_record_shop.model.Genre;
 import com.northcoders.jv_record_shop.repository.RecordShopRepository;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,12 +14,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @DataJpaTest
 class ServiceLayerImplTest {
@@ -50,49 +51,46 @@ class ServiceLayerImplTest {
 
         List<Album> result = recordShopServiceLayer.getAllAlbums();
 
-        Assertions.assertEquals(3,result.size());
         Assertions.assertAll(
                 () ->Assertions.assertEquals(3,result.size()),
                 () ->Assertions.assertEquals(albumList,result)
         );
 
     }
-//    Album getAlbumById(String id);
 
-
-
-    // Set up an Answer object that will set the id of an Album after the repository call for adding an Album
-    @Before("addAlbum_ValidTest")
-    Answer<Album> setUpAnswer() {
-        return invocationOnMock -> {
-            Album album = invocationOnMock.getArgument(0, Album.class);
-            album.setId(1);
-            return album;
-        };
-    }
     @Test
-    @DisplayName("addAlbum returns an added album with an Id")
-    void addAlbum_test(){
+    @DisplayName("getAlbumById returns an Album when given a valid Id")
+    void getAlbumById_ValidIdTest(){
         Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbum = Album.builder()
-                .name("TestAlbumOne")
-                .genre(Genre.RAP.toString())
-                .stock(131)
-                .artist(testArtist)
-                .price(10.00)
-                .releaseDate(LocalDate.of(2024, 12, 5))
-                .build();
+        Album testAlbum = new Album(1, "testOne", testArtist, Genre.JAZZ.toString(),
+                LocalDate.of(2024, 12, 5), 5, 10.50);
 
-        Mockito.when(mockRecordShopRepository.save(testAlbum)).thenAnswer(setUpAnswer());
+        String testId = "1";
+        Mockito.when(mockRecordShopRepository.findById(1L)).thenReturn(Optional.of((testAlbum)));
+        Album result = recordShopServiceLayer.getAlbumById(testId);
 
-        Album result = recordShopServiceLayer.addAlbum(testAlbum);
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(1,result.getId()),
-                () -> Assertions.assertEquals("TestAlbumOne",result.getName())
+                () ->Assertions.assertEquals(1,result.getId()),
+                () ->Assertions.assertEquals("testOne",result.getName())
         );
     }
-    //    Album updateAlbumDetails(String id,Album album);
-    //    boolean deleteAlbumById(String id);
+
+    @Test
+    @DisplayName("getAlbumById throws an InvalidInputException error for an invalid input")
+    void getAlbumById_InvalidIdTest(){
+
+        String testId = "B";
+        Assertions.assertThrows(InvalidInputException.class, () -> recordShopServiceLayer.getAlbumById(testId));
+    }
+
+    @Test
+    @DisplayName("getAlbumById throws an ItemNotFoundException for a valid id with no associated album in database")
+    void getAlbumById_NoIdTest(){
+        String testId = "1";
+        Assertions.assertThrows(ItemNotFoundException.class, () -> recordShopServiceLayer.getAlbumById(testId));
+    }
+
+
 
 }

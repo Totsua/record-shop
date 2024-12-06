@@ -1,13 +1,15 @@
 package com.northcoders.jv_record_shop.service;
 
+import com.northcoders.jv_record_shop.exception.InvalidInputException;
+import com.northcoders.jv_record_shop.exception.ItemNotFoundException;
 import com.northcoders.jv_record_shop.model.Album;
 import com.northcoders.jv_record_shop.repository.RecordShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
@@ -23,7 +25,20 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
 
     @Override
     public Album getAlbumById(String id) {
-        return null;
+        long longId;
+        try{
+            longId = Long.parseLong(id);
+        }catch (NumberFormatException e){
+            throw new InvalidInputException(id+ " is not a valid id");
+        }
+        Optional<Album> potentialAlbum = recordShopRepository.findById(longId);
+
+        if(potentialAlbum.isPresent()){
+            return potentialAlbum.get();
+        }
+        else{
+            throw new ItemNotFoundException("No album with id " + id);
+        }
     }
 
     @Override

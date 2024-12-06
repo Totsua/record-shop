@@ -217,6 +217,24 @@ class RecordShopControllerTests {
 
     }
 
+    @Test
+    @DisplayName("updateAlbumDetails returns error 404 for an invalid id")
+    void updateAlbumDetails_InvalidId() throws Exception {
+
+        Album testAlbumUpdated = Album.builder().id(3).stock(3).price(5.0).build();
+
+        String testJSON = mapper.writeValueAsString(testAlbumUpdated);
+
+
+        Mockito.when(mockRecordShopServiceImpl.updateAlbumDetails("3",testAlbumUpdated))
+                .thenThrow(ItemNotFoundException.class);
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/recordshop/3")
+                                .contentType(MediaType.APPLICATION_JSON).content(testJSON))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+    }
 
 
 

@@ -23,7 +23,7 @@ public class Artist {
     @Column(updatable = false, nullable = false)
     long id;
 
-    @NotBlank(message = "An artist's name must be included")
+    @NotBlank(message = "An artist's name must not be empty")
     @Column (nullable = false)
     String name;
 

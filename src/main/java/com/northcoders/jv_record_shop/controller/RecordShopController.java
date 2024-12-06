@@ -28,8 +28,7 @@ public class RecordShopController {
 
     @PostMapping
     public ResponseEntity<Album> addAlbum(@RequestBody Album album){
-
-        return null;
+        return new ResponseEntity<>(recordShopService.addAlbum(album),HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")

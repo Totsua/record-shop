@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -15,7 +16,9 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
 
     @Override
     public List<Album> getAllAlbums() {
-        return null;
+        List<Album> albumList = new ArrayList<>();
+        recordShopRepository.findAll().forEach(albumList::add);
+        return albumList;
     }
 
     @Override

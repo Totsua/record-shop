@@ -278,9 +278,20 @@ class RecordShopControllerTests {
         Mockito.when(mockRecordShopServiceImpl.deleteAlbumById("1")).thenReturn(true);
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.patch("/api/v1/recordshop/1"))
+                        MockMvcRequestBuilders.delete("/api/v1/recordshop/1"))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
+    }
+    @Test
+    @DisplayName("deleteAlbumByID returns Status 404 for an invalid Id")
+    void deleteAlbumByID_InvalidId() throws Exception{
+
+
+        Mockito.when(mockRecordShopServiceImpl.deleteAlbumById("1")).thenReturn(false);
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.delete("/api/v1/recordshop/1"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
 

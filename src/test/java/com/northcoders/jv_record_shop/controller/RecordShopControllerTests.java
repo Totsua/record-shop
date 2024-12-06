@@ -61,11 +61,11 @@ class RecordShopControllerTests {
     void getAllAlbums_Test() throws Exception {
         Artist testArtist = new Artist(1L, "THE Artist");
 
-        Album testAlbum1 = new Album(1L, "testOne", testArtist, Genre.JAZZ,
+        Album testAlbum1 = new Album(1L, "testOne", testArtist, Genre.JAZZ.toString(),
                 LocalDate.of(2024,12,5),5,10.50);
-        Album testAlbum2 = new Album(2L, "testTwo", testArtist, Genre.POP,
+        Album testAlbum2 = new Album(2L, "testTwo", testArtist, Genre.POP.toString(),
                 LocalDate.of(2024,12,5),2,12.12);
-        Album testAlbum3 = new Album(3L, "testThree", testArtist, Genre.UNKNOWN,
+        Album testAlbum3 = new Album(3L, "testThree", testArtist, Genre.UNKNOWN.toString(),
                 LocalDate.of(2024,12,5),9,5.0);
 
         List<Album> albumList = List.of(testAlbum1, testAlbum2, testAlbum3);
@@ -89,7 +89,7 @@ class RecordShopControllerTests {
     @DisplayName("Get Album by the id given a valid id")
     void getAlbumById_ValidIdTest() throws Exception{
         Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbum = new Album(1, "testOne", testArtist, Genre.JAZZ,
+        Album testAlbum = new Album(1, "testOne", testArtist, Genre.JAZZ.toString(),
                 LocalDate.of(2000,10,10),5,10.50);
 
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("1")).thenReturn(testAlbum);
@@ -132,7 +132,7 @@ class RecordShopControllerTests {
         Artist testArtist = new Artist(1,"THE Artist");
         Album testAlbum = Album.builder()
                 .name("TestAlbumOne")
-                .genre(Genre.RAP)
+                .genre(Genre.RAP.toString())
                 .stock(131)
                 .artist(testArtist)
                 .price(10.00)
@@ -165,7 +165,7 @@ class RecordShopControllerTests {
         Album testAlbum = Album.builder()
                 .id(10)
                 .name("TestAlbumOne")
-                .genre(Genre.UNKNOWN)
+                .genre(Genre.UNKNOWN.toString())
                 .stock(4)
                 .artist(testArtist)
                 .price(10.00)
@@ -204,7 +204,7 @@ class RecordShopControllerTests {
         Album testAlbum = Album.builder().id(3)
                 .name("TestAlbumOne")
                 .artist(testArtist)
-                .genre(Genre.HIPHOP)
+                .genre(Genre.HIPHOP.toString())
                 .releaseDate(LocalDate.of(2014,12,12))
                         .stock(3)
                                 .price(5.0).build();

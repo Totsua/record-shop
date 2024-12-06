@@ -5,6 +5,7 @@ import com.northcoders.jv_record_shop.model.Album;
 import com.northcoders.jv_record_shop.model.Artist;
 import com.northcoders.jv_record_shop.model.Genre;
 import com.northcoders.jv_record_shop.repository.RecordShopRepository;
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDate;
@@ -55,6 +57,42 @@ class ServiceLayerImplTest {
         );
 
     }
+//    Album getAlbumById(String id);
 
+
+
+    // Set up an Answer object that will set the id of an Album after the repository call for adding an Album
+    @Before("addAlbum_ValidTest")
+    Answer<Album> setUpAnswer() {
+        return invocationOnMock -> {
+            Album album = invocationOnMock.getArgument(0, Album.class);
+            album.setId(1);
+            return album;
+        };
+    }
+    @Test
+    @DisplayName("addAlbum returns an added album with an Id")
+    void addAlbum_test(){
+        Artist testArtist = new Artist(1, "THE Artist");
+        Album testAlbum = Album.builder()
+                .name("TestAlbumOne")
+                .genre(Genre.RAP.toString())
+                .stock(131)
+                .artist(testArtist)
+                .price(10.00)
+                .releaseDate(LocalDate.of(2024, 12, 5))
+                .build();
+
+        Mockito.when(mockRecordShopRepository.save(testAlbum)).thenAnswer(setUpAnswer());
+
+        Album result = recordShopServiceLayer.addAlbum(testAlbum);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1,result.getId()),
+                () -> Assertions.assertEquals("TestAlbumOne",result.getName())
+        );
+    }
+    //    Album updateAlbumDetails(String id,Album album);
+    //    boolean deleteAlbumById(String id);
 
 }

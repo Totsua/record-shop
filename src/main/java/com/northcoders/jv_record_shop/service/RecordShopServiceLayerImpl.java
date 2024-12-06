@@ -28,7 +28,8 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
 
     @Override
     public Album addAlbum(Album album) {
-        return null;
+        return recordShopRepository.save(album);
+
     }
 
     @Override

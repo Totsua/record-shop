@@ -1,6 +1,5 @@
 package com.northcoders.jv_record_shop.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.northcoders.jv_record_shop.exception.APIExceptionHandler;
@@ -17,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,7 +27,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @AutoConfigureMockMvc
@@ -104,11 +101,22 @@ class RecordShopControllerTests {
 
 
     @Test
-    @DisplayName("getAlbumById throws an error 404 for an invalid Id")
-    void getAlbumById_InvalidIdInput() throws Exception {
+    @DisplayName("getAlbumById throws an error 400 for an invalid Id")
+    void getAlbumById_InvalidIdInputTest() throws Exception {
+
+        Mockito.when(mockRecordShopServiceImpl.getAlbumById("B"))
+                .thenThrow(new InvalidInputException("B is not a valid Id"));
+
+        this.mockMvcController.perform(MockMvcRequestBuilders.get("/api/v1/recordshop/B"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("getAlbumById throws an error 404 for a valid Id with no Album associated with that id")
+    void getAlbumById_ValidIdNoAlbumInputTest() throws Exception {
 
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("1"))
-                .thenThrow(new ItemNotFoundException("1 is not a valid Id"));
+                .thenThrow(new ItemNotFoundException("There is no Album with id 1"));
 
         this.mockMvcController.perform(MockMvcRequestBuilders.get("/api/v1/recordshop/1"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -177,7 +185,7 @@ class RecordShopControllerTests {
 
 
     @Test
-    @DisplayName("AddAlbum returns the created album with an id with a valid input that comes with a different id")
+    @DisplayName("AddAlbum returns the created album with a generated id from the database with a valid album input that comes with a different id")
     void addAlbum_WithAnIdTest() throws Exception {
 
         // Assigning Artist and Album objects
@@ -196,6 +204,7 @@ class RecordShopControllerTests {
         String testJSON = mapper.writeValueAsString(testAlbum);
 
         // Returning the Album with an ID from the Mock Service
+        // Assuming this is the first Album in the database, should return with id of 1
         Mockito.when(mockRecordShopServiceImpl.addAlbum(testAlbum)).thenAnswer(setUpAnswer());
 
 
@@ -239,8 +248,8 @@ class RecordShopControllerTests {
     }
 
     @Test
-    @DisplayName("updateAlbumDetails returns error 404 for an invalid id")
-    void updateAlbumDetails_InvalidId() throws Exception {
+    @DisplayName("updateAlbumDetails returns error 404 for an valid id with no Album associated with the id")
+    void updateAlbumDetails_ValidIdNoAlbum() throws Exception {
 
         Album testAlbumUpdated = Album.builder().id(3).stock(3).price(5.0).build();
 
@@ -257,25 +266,37 @@ class RecordShopControllerTests {
 
     }
     @Test
-    @DisplayName("updateAlbumDetails returns error 400 for an invalid inputs")
-    void updateAlbumDetails_InvalidInputValidId() throws Exception {
+    @DisplayName("updateAlbumDetails returns error 400 for valid id with invalid inputs")
+    void updateAlbumDetails_ValidIdInvalidInputTest() throws Exception {
 
-        String testJSON = "{\"id\":\"1\",\"name\":\"\"}";
+        String testJSON = "{\"name\":\"\"}";
+        Album testAlbum = Album.builder().name("").build();
 
+
+        Mockito.when(mockRecordShopServiceImpl.updateAlbumDetails("1",testAlbum))
+                .thenThrow(new InvalidInputException("name cannot be blank"));
 
         this.mockMvcController.perform(
                         MockMvcRequestBuilders.patch("/api/v1/recordshop/1")
                                 .contentType(MediaType.APPLICATION_JSON).content(testJSON))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("name cannot be blank"));
-
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
+    @Test
+    @DisplayName("updateAlbumDetails returns error 400 for invalid Id")
+    void updateAlbumDetails_InvalidIdTest() throws Exception {
+
+        String testJSON = "{\"id\":\"B\"}";
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/recordshop/B"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+
+
     @Test
     @DisplayName("deleteAlbumByID returns Status 204 for a valid Id")
     void deleteAlbumByID_ValidId() throws Exception{
-
-
-        Mockito.when(mockRecordShopServiceImpl.deleteAlbumById("1")).thenReturn(true);
 
         this.mockMvcController.perform(
                         MockMvcRequestBuilders.delete("/api/v1/recordshop/1"))
@@ -283,16 +304,26 @@ class RecordShopControllerTests {
 
     }
     @Test
-    @DisplayName("deleteAlbumByID returns Status 404 for an invalid Id")
-    void deleteAlbumByID_InvalidId() throws Exception{
+    @DisplayName("deleteAlbumByID returns error 404 for a valid Id with no Album associated with that id")
+    void deleteAlbumByID_ValidIdNoAlbum() throws Exception{
 
-
-        Mockito.when(mockRecordShopServiceImpl.deleteAlbumById("1")).thenReturn(false);
+        Mockito.when(mockRecordShopServiceImpl.deleteAlbumById("1")).thenThrow(new ItemNotFoundException("No album with id 1"));
 
         this.mockMvcController.perform(
                         MockMvcRequestBuilders.delete("/api/v1/recordshop/1"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
+    @Test
+    @DisplayName("deleteAlbumByID returns error 400 for an invalid Id")
+    void deleteAlbumByID_InvalidId() throws Exception{
+
+        Mockito.when(mockRecordShopServiceImpl.deleteAlbumById("B"))
+                .thenThrow(new InvalidInputException("B is not a valid id"));
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.delete("/api/v1/recordshop/B"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
 
 }

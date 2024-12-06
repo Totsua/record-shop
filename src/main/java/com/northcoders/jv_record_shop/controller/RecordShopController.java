@@ -2,6 +2,7 @@ package com.northcoders.jv_record_shop.controller;
 
 import com.northcoders.jv_record_shop.model.Album;
 import com.northcoders.jv_record_shop.service.RecordShopServiceLayer;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,19 +28,17 @@ public class RecordShopController {
     }
 
     @PostMapping
-    public ResponseEntity<Album> addAlbum(@RequestBody Album album){
+    public ResponseEntity<Album> addAlbum(@RequestBody @Valid Album album){
         return new ResponseEntity<>(recordShopService.addAlbum(album),HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Album> updateAlbumDetails(@PathVariable String id, @RequestBody Album album){
-
-        return null;
+    public ResponseEntity<Album> updateAlbumDetails(@PathVariable String id, @RequestBody  Album album){
+        return new ResponseEntity<>(recordShopService.updateAlbumDetails(id,album),HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Album> deleteAlbumByID(@PathVariable String id){
-
         return null;
     }
 

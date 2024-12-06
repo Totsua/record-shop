@@ -61,9 +61,12 @@ class RecordShopControllerTests {
     void getAllAlbums_Test() throws Exception {
         Artist testArtist = new Artist(1L, "THE Artist");
 
-        Album testAlbum1 = new Album(1L, "testOne", testArtist, Genre.JAZZ, LocalDate.now(),5,10.50);
-        Album testAlbum2 = new Album(2L, "testTwo", testArtist, Genre.POP, LocalDate.now(),2,12.12);
-        Album testAlbum3 = new Album(3L, "testThree", testArtist, Genre.UNKNOWN, LocalDate.now(),9,5.0);
+        Album testAlbum1 = new Album(1L, "testOne", testArtist, Genre.JAZZ,
+                LocalDate.of(2024,12,5),5,10.50);
+        Album testAlbum2 = new Album(2L, "testTwo", testArtist, Genre.POP,
+                LocalDate.of(2024,12,5),2,12.12);
+        Album testAlbum3 = new Album(3L, "testThree", testArtist, Genre.UNKNOWN,
+                LocalDate.of(2024,12,5),9,5.0);
 
         List<Album> albumList = List.of(testAlbum1, testAlbum2, testAlbum3);
 
@@ -86,7 +89,8 @@ class RecordShopControllerTests {
     @DisplayName("Get Album by the id given a valid id")
     void getAlbumById_ValidIdTest() throws Exception{
         Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbum = new Album(1, "testOne", testArtist, Genre.JAZZ, LocalDate.now(),5,10.50);
+        Album testAlbum = new Album(1, "testOne", testArtist, Genre.JAZZ,
+                LocalDate.of(2000,10,10),5,10.50);
 
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("1")).thenReturn(testAlbum);
 
@@ -95,7 +99,7 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("JAZZ"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("05-12-2024"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("10-10-2000"));
     }
 
 

@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class Artist {
     @Column(updatable = false, nullable = false)
     long id;
 
+    @NotBlank(message = "An artist's name must be included")
     @Column (nullable = false)
     String name;
 

@@ -3,6 +3,7 @@ package com.northcoders.jv_record_shop.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.northcoders.jv_record_shop.exception.APIExceptionHandler;
+import com.northcoders.jv_record_shop.exception.InvalidInputException;
 import com.northcoders.jv_record_shop.exception.ItemNotFoundException;
 import com.northcoders.jv_record_shop.model.Album;
 import com.northcoders.jv_record_shop.model.Artist;
@@ -124,7 +125,7 @@ class RecordShopControllerTests {
 
         // Assigning Artist and Album objects
         Artist testArtist = new Artist(1,"THE Artist");
-        Album testAlbum = Album.builder()//.id(0)
+        Album testAlbum = Album.builder()
                 .name("TestAlbumOne")
                 .genre(Genre.RAP)
                 .stock(131)
@@ -148,4 +149,43 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("RAP"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("05-12-2024"));
     }
+
+    // adding album but including an id -> should still create the album but not with that id
+    @Test
+    @DisplayName("AddAlbum returns the created album with an id with a valid input that comes with a different id")
+    void addAlbum_WithAnIdTest() throws Exception {
+
+        // Assigning Artist and Album objects
+        Artist testArtist = new Artist(1,"THE Artist");
+        Album testAlbum = Album.builder()
+                .id(10)
+                .name("TestAlbumOne")
+                .genre(Genre.UNKNOWN)
+                .stock(4)
+                .artist(testArtist)
+                .price(10.00)
+                .releaseDate(LocalDate.of(2020,12,6))
+                .build();
+
+        // Mapping the object to a JSON
+        String testJSON = mapper.writeValueAsString(testAlbum);
+
+        // Returning the Album with an ID from the Mock Service
+        Mockito.when(mockRecordShopServiceImpl.addAlbum(testAlbum)).thenAnswer(setUpAnswer());
+
+
+        this.mockMvcController.perform(
+                        MockMvcRequestBuilders.post("/api/v1/recordshop")
+                                .contentType(MediaType.APPLICATION_JSON).content(testJSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("UNKNOWN"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("06-12-2020"));
+    }
+
+
+
+
+
+
 }

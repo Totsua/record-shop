@@ -27,11 +27,4 @@ public class GenreValidatorConstraint implements ConstraintValidator<GenreValida
 
     }
 
-//    @Override
-//    public boolean isValid( Enum<?> value, ConstraintValidatorContext constraintValidatorContext) {
-//        if(value == null){
-//            return true;
-//        }
-//        return values.contains(value.toString());
-//    }
 }

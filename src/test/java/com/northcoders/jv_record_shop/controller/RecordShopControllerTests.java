@@ -8,15 +8,19 @@ import com.northcoders.jv_record_shop.model.Album;
 import com.northcoders.jv_record_shop.model.Artist;
 import com.northcoders.jv_record_shop.model.Genre;
 import com.northcoders.jv_record_shop.service.RecordShopServiceLayerImpl;
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -102,5 +106,46 @@ class RecordShopControllerTests {
 
         this.mockMvcController.perform(MockMvcRequestBuilders.get("/api/v1/recordshop/1"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    // Set up an Answer object that will set the id of an Album after the Service call for adding an Album
+    @Before("addAlbum_ValidTest")
+    Answer<Album> setUpAnswer() {
+        return invocationOnMock -> {
+            Album album = invocationOnMock.getArgument(0, Album.class);
+            album.setId(1);
+            return album;
+        };
+    }
+
+    @Test
+    @DisplayName("AddAlbum returns the created album with a valid input")
+    void addAlbum_ValidTest() throws Exception {
+
+        // Assigning Artist and Album objects
+        Artist testArtist = new Artist(1,"THE Artist");
+        Album testAlbum = Album.builder()//.id(0)
+                .name("TestAlbumOne")
+                .genre(Genre.RAP)
+                .stock(131)
+                .artist(testArtist)
+                .price(10.00)
+                .releaseDate(LocalDate.of(2024,12,5))
+                .build();
+
+        // Mapping the object to a JSON
+        String testJSON = mapper.writeValueAsString(testAlbum);
+
+        // Returning the Album with an ID from the Mock Service
+        Mockito.when(mockRecordShopServiceImpl.addAlbum(testAlbum)).thenAnswer(setUpAnswer());
+
+
+        this.mockMvcController.perform(
+                MockMvcRequestBuilders.post("/api/v1/recordshop")
+                        .contentType(MediaType.APPLICATION_JSON).content(testJSON))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("RAP"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("05-12-2024"));
     }
 }

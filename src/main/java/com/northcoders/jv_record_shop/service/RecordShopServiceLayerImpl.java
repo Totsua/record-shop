@@ -53,8 +53,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
     }
 
     @Override
-    public boolean deleteAlbumById(String id) {
-        return false;
+    public void deleteAlbumById(String id) {
     }
 
 }

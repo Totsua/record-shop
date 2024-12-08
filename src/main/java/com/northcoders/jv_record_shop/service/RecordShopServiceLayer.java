@@ -11,5 +11,5 @@ public interface RecordShopServiceLayer {
     Album getAlbumById(String id);
     Album addAlbum(Album album);
     Album updateAlbumDetails(String id,Album album);
-    boolean deleteAlbumById(String id);
+    void deleteAlbumById(String id);
 }

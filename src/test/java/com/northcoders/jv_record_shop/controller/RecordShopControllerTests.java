@@ -307,7 +307,7 @@ class RecordShopControllerTests {
     @DisplayName("deleteAlbumByID returns error 404 for a valid Id with no Album associated with that id")
     void deleteAlbumByID_ValidIdNoAlbum() throws Exception{
 
-        Mockito.when(mockRecordShopServiceImpl.deleteAlbumById("1")).thenThrow(new ItemNotFoundException("No album with id 1"));
+        Mockito.doThrow(new ItemNotFoundException("There is no album with id 1")).when(mockRecordShopServiceImpl).deleteAlbumById("1");
 
         this.mockMvcController.perform(
                         MockMvcRequestBuilders.delete("/api/v1/recordshop/1"))
@@ -318,8 +318,7 @@ class RecordShopControllerTests {
     @DisplayName("deleteAlbumByID returns error 400 for an invalid Id")
     void deleteAlbumByID_InvalidId() throws Exception{
 
-        Mockito.when(mockRecordShopServiceImpl.deleteAlbumById("B"))
-                .thenThrow(new InvalidInputException("B is not a valid id"));
+        Mockito.doThrow(new InvalidInputException("B is not a valid id")).when(mockRecordShopServiceImpl).deleteAlbumById("B");
 
         this.mockMvcController.perform(
                         MockMvcRequestBuilders.delete("/api/v1/recordshop/B"))

@@ -39,13 +39,11 @@ public class Album {
     Artist artist;
 
     @Column(nullable = false)
-//    @Enumerated(EnumType.STRING) // Puts the enum in text form in the database
     @GenreValidator(enumClass = Genre.class)
     String genre;
 
     @Column(nullable = false)
     @JsonFormat(pattern = "dd-MM-yyyy")
-    // @NotBlank(message = "releaseDate must contain an entry in format \"dd-MM-yyyy\"")
     @NotNull(message = "releaseDate must contain an entry in format \"dd-MM-yyyy\"")
     LocalDate releaseDate;
 

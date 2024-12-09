@@ -178,7 +178,7 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("name cannot be blank"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("must be any of Genre {ROCK,HIPHOP,RAP,JAZZ,POP,UNKNOWN}"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stock").value("stock cannot be negative"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("price cannot be negative, we aren't paying people to take the album"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("price cannot be negative because we aren't paying people to take the album"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("releaseDate must contain an entry in format \"dd-MM-yyyy\""))
                 .andExpect(MockMvcResultMatchers.jsonPath("$['artist.name']").value("An artist's name must not be empty"));
     }

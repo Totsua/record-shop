@@ -48,8 +48,48 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
     }
 
     @Override
-    public Album updateAlbumDetails(String id, Album album) {
-        return null;
+    public Album updateAlbumDetails(String id, Album albumUpdateInfo) {
+        long longId;
+
+        try{
+            longId = Long.parseLong(id);
+        }catch (NumberFormatException e){
+            throw new InvalidInputException(id + " is not a valid id");
+        }
+
+
+
+        if(recordShopRepository.existsById(longId)){
+            // Mockito doesn't seem to like getting the Album via ".get()" on the Optional Album in one line
+            // Therefore it's done in two
+            Optional<Album> optionalAlbumInDb = recordShopRepository.findById(longId);
+            Album albumInDb = optionalAlbumInDb.get();
+            if(albumUpdateInfo.getName() != null){
+                albumInDb.setName(albumUpdateInfo.getName());
+            }
+            if(albumUpdateInfo.getArtist() != null){
+                albumInDb.setArtist(albumUpdateInfo.getArtist());
+            }
+            if(albumUpdateInfo.getGenre() != null){
+                albumInDb.setGenre(albumUpdateInfo.getGenre());
+            }
+            if(albumUpdateInfo.getReleaseDate() != null){
+                albumInDb.setReleaseDate(albumUpdateInfo.getReleaseDate());
+            }
+            if(albumUpdateInfo.getStock() != null){
+                albumInDb.setStock(albumUpdateInfo.getStock());
+            }
+            if(albumUpdateInfo.getPrice() != null){
+                albumInDb.setPrice(albumUpdateInfo.getPrice());
+            }
+            return recordShopRepository.save(albumInDb);
+
+
+        }else{
+            throw new ItemNotFoundException("There is no album with id: " + id);
+        }
+
+
     }
 
     @Override

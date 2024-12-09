@@ -57,7 +57,7 @@ public class Album {
 
     @Column(nullable = false,precision = 2)
     @NotNull(message = "price must not be empty")
-    @Range(min=0,message = "price cannot be negative, we aren't paying people to take the album")
+    @Range(min=0,message = "price cannot be negative because we aren't paying people to take the album")
     Double price;
 
 }

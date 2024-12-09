@@ -54,6 +54,20 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
 
     @Override
     public void deleteAlbumById(String id) {
+        long longId;
+        try{
+            longId = Long.parseLong(id);
+        }catch (NumberFormatException e){
+            throw new InvalidInputException(id + "is not a valid id");
+        }
+
+        if(recordShopRepository.existsById(longId)){
+            recordShopRepository.deleteById(longId);
+        }else{
+            throw new ItemNotFoundException("There is no album with id: " + id);
+        }
+
+
     }
 
 }

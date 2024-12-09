@@ -3,6 +3,7 @@ package com.northcoders.jv_record_shop.service;
 import com.northcoders.jv_record_shop.exception.InvalidInputException;
 import com.northcoders.jv_record_shop.exception.ItemNotFoundException;
 import com.northcoders.jv_record_shop.model.Album;
+import com.northcoders.jv_record_shop.repository.ArtistRepository;
 import com.northcoders.jv_record_shop.repository.RecordShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import java.util.Optional;
 public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
     @Autowired
     RecordShopRepository recordShopRepository;
+    @Autowired
+    ArtistRepository artistRepository;
 
     @Override
     public List<Album> getAllAlbums() {
@@ -43,6 +46,14 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
 
     @Override
     public Album addAlbum(Album album) {
+        album.setId(0); // Set to 0 in case the user inputs an id
+
+        if(artistRepository.existsById(album.getArtist().getId())){
+            album.setArtist(artistRepository.findById(album.getArtist().getId()).get());
+        }else{
+            album.getArtist().setId(0); // Set to 0 in case the user inputs an artist id that's not in the database
+        }
+
         return recordShopRepository.save(album);
 
     }

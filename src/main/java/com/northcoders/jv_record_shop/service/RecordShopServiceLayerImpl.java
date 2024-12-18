@@ -1,8 +1,11 @@
 package com.northcoders.jv_record_shop.service;
 
+import com.northcoders.jv_record_shop.dto.AlbumDTO;
+import com.northcoders.jv_record_shop.dto.ArtistDTO;
 import com.northcoders.jv_record_shop.exception.InvalidInputException;
 import com.northcoders.jv_record_shop.exception.ItemNotFoundException;
 import com.northcoders.jv_record_shop.model.Album;
+import com.northcoders.jv_record_shop.model.Artist;
 import com.northcoders.jv_record_shop.repository.ArtistRepository;
 import com.northcoders.jv_record_shop.repository.RecordShopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +23,14 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
     ArtistRepository artistRepository;
 
     @Override
-    public List<Album> getAllAlbums() {
+    public List<AlbumDTO> getAllAlbums() {
         List<Album> albumList = new ArrayList<>();
         recordShopRepository.findAll().forEach(albumList::add);
-        return albumList;
+        return albumList.stream().map(this::mapAlbumToDTO).toList();
     }
 
     @Override
-    public Album getAlbumById(String id) {
+    public AlbumDTO getAlbumById(String id) {
         long longId;
         try{
             longId = Long.parseLong(id);
@@ -35,9 +38,9 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
             throw new InvalidInputException(id+ " is not a valid id");
         }
         Optional<Album> potentialAlbum = recordShopRepository.findById(longId);
-
         if(potentialAlbum.isPresent()){
-            return potentialAlbum.get();
+            return mapAlbumToDTO(potentialAlbum.get());
+            //return potentialAlbum.get();
         }
         else{
             throw new ItemNotFoundException("No album with id " + id);
@@ -45,21 +48,25 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
     }
 
     @Override
-    public Album addAlbum(Album album) {
-        album.setId(0); // Set to 0 in case the user inputs an id
+    public AlbumDTO addAlbum(AlbumDTO albumInput) {
+        albumInput.setId(0); // Set to 0 in case the user inputs an id
 
+        Album album = mapDTOToAlbum(albumInput);
+        System.out.println(album);
         if(artistRepository.existsById(album.getArtist().getId())){
             album.setArtist(artistRepository.findById(album.getArtist().getId()).get());
+            System.out.println(album);
         }else{
             album.getArtist().setId(0); // Set to 0 in case the user inputs an artist id that's not in the database
         }
 
-        return recordShopRepository.save(album);
+        Album albumDTO = recordShopRepository.save(album);
+        return mapAlbumToDTO(albumDTO);
 
     }
 
     @Override
-    public Album updateAlbumDetails(String id, Album albumUpdateInfo) {
+    public AlbumDTO updateAlbumDetails(String id, AlbumDTO albumUpdateInfo) {
         long longId;
 
         try{
@@ -79,7 +86,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
                 albumInDb.setName(albumUpdateInfo.getName());
             }
             if(albumUpdateInfo.getArtist() != null){
-                albumInDb.setArtist(albumUpdateInfo.getArtist());
+                albumInDb.setArtist(mapDTOToArtist(albumUpdateInfo.getArtist()));
             }
             if(albumUpdateInfo.getGenre() != null){
                 albumInDb.setGenre(albumUpdateInfo.getGenre());
@@ -93,7 +100,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
             if(albumUpdateInfo.getPrice() != null){
                 albumInDb.setPrice(albumUpdateInfo.getPrice());
             }
-            return recordShopRepository.save(albumInDb);
+            return mapAlbumToDTO(recordShopRepository.save(albumInDb));
 
 
         }else{
@@ -118,6 +125,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
             throw new ItemNotFoundException("There is no album with id: " + id);
         }
 
+    }
 
     private AlbumDTO mapAlbumToDTO(Album album){
         System.out.println(album);

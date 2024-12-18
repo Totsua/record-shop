@@ -119,6 +119,45 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
         }
 
 
+    private AlbumDTO mapAlbumToDTO(Album album){
+        System.out.println(album);
+        return AlbumDTO.builder()
+                .id(album.getId())
+                .name(album.getName())
+                .artist(mapArtistToDTO(album.getArtist()))
+                .genre(album.getGenre())
+                .releaseDate(album.getReleaseDate())
+                .price(album.getPrice())
+                .stock(album.getStock())
+                .build();
     }
+
+    private ArtistDTO mapArtistToDTO(Artist artist){
+        return ArtistDTO.builder()
+                .id(artist.getId())
+                .name(artist.getName())
+                .build();
+    }
+
+    private Album mapDTOToAlbum(AlbumDTO albumDTO){
+        return Album.builder()
+                .id(albumDTO.getId())
+                .name(albumDTO.getName())
+                .artist(mapDTOToArtist(albumDTO.getArtist()))
+                .genre(albumDTO.getGenre())
+                .releaseDate(albumDTO.getReleaseDate())
+                .price(albumDTO.getPrice())
+                .stock(albumDTO.getStock())
+                .build();
+    }
+
+    private Artist mapDTOToArtist(ArtistDTO artistDTO){
+        return Artist.builder()
+                .id(artistDTO.getId())
+                .name(artistDTO.getName())
+                .build();
+    }
+
+
 
 }

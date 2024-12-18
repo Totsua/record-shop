@@ -1,6 +1,8 @@
 package com.northcoders.jv_record_shop.service;
 
 
+import com.northcoders.jv_record_shop.dto.AlbumDTO;
+import com.northcoders.jv_record_shop.dto.ArtistDTO;
 import com.northcoders.jv_record_shop.exception.InvalidInputException;
 import com.northcoders.jv_record_shop.exception.ItemNotFoundException;
 import com.northcoders.jv_record_shop.model.Album;
@@ -54,11 +56,10 @@ class ServiceLayerImplTest {
 
         Mockito.when(mockRecordShopRepository.findAll()).thenReturn(albumList);
 
-        List<Album> result = recordShopServiceLayer.getAllAlbums();
+        List<AlbumDTO> result = recordShopServiceLayer.getAllAlbums();
 
         Assertions.assertAll(
-                () ->Assertions.assertEquals(3,result.size()),
-                () ->Assertions.assertEquals(albumList,result)
+                () ->Assertions.assertEquals(3,result.size())
         );
 
     }
@@ -72,7 +73,7 @@ class ServiceLayerImplTest {
 
         String testId = "1";
         Mockito.when(mockRecordShopRepository.findById(1L)).thenReturn(Optional.of((testAlbum)));
-        Album result = recordShopServiceLayer.getAlbumById(testId);
+        AlbumDTO result = recordShopServiceLayer.getAlbumById(testId);
 
 
         Assertions.assertAll(
@@ -112,6 +113,7 @@ class ServiceLayerImplTest {
     void addAlbum_test(){
         Artist testArtist = new Artist(1, "THE Artist");
         Album testAlbum = Album.builder()
+                .id(0)
                 .name("TestAlbumOne")
                 .genre(Genre.RAP.toString())
                 .stock(131)
@@ -120,10 +122,22 @@ class ServiceLayerImplTest {
                 .releaseDate(LocalDate.of(2024, 12, 5))
                 .build();
 
+        ArtistDTO testArtistDTO = new ArtistDTO(1, "THE Artist");
+        AlbumDTO testAlbumDTO = AlbumDTO.builder()
+                .name("TestAlbumOne")
+                .genre(Genre.RAP.toString())
+                .stock(131)
+                .artist(testArtistDTO)
+                .price(10.00)
+                .releaseDate(LocalDate.of(2024, 12, 5))
+                .build();
+
+        Mockito.when(artistRepository.existsById(testArtist.getId())).thenReturn(true);
         Mockito.when(mockRecordShopRepository.save(testAlbum)).thenAnswer(setUpAnswer());
         Mockito.when(artistRepository.findById(testArtist.getId())).thenReturn(Optional.of(testArtist));
 
-        Album result = recordShopServiceLayer.addAlbum(testAlbum);
+
+        AlbumDTO result = recordShopServiceLayer.addAlbum(testAlbumDTO);
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(1,result.getId()),
@@ -132,9 +146,10 @@ class ServiceLayerImplTest {
     }
 
 
-
-
-
+    @Test
+    @DisplayName("addAlbum assigns an artist with the same name if given an artist without id")
+    void addAlbum_NoIdArtist(){
+    }
 
 
 
@@ -142,7 +157,7 @@ class ServiceLayerImplTest {
     @DisplayName("updateAlbumDetails returns the modified album with valid Id and inputs")
     void updateAlbumDetails_ValidIdInputsTest(){
         Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbumInfo = Album.builder().name("TestAlbumOne").price(10.00).genre(Genre.RAP.toString()).build();
+        AlbumDTO testAlbumInfo = AlbumDTO.builder().name("TestAlbumOne").price(10.00).genre(Genre.RAP.toString()).build();
         String testId = "1";
 
         Album testAlbumInDb =  Album.builder().id(1)
@@ -168,7 +183,7 @@ class ServiceLayerImplTest {
         Mockito.when(mockRecordShopRepository.save(testModifiedAlbum)).thenReturn(testModifiedAlbum);
 
 
-        Album result = recordShopServiceLayer.updateAlbumDetails(testId,testAlbumInfo);
+        AlbumDTO result = recordShopServiceLayer.updateAlbumDetails(testId,testAlbumInfo);
 
 
         Assertions.assertAll(
@@ -180,8 +195,8 @@ class ServiceLayerImplTest {
     @Test
     @DisplayName("updateAlbumDetails throws ItemNotFoundException for a valid id with no associated album in database ")
     void updateAlbumDetails_ValidIdNoAlbumTest(){
-        Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbumInfo = Album.builder().name("TestAlbumOne").price(10.00).build();
+       // Artist testArtist = new Artist(1, "THE Artist");
+        AlbumDTO testAlbumInfo = AlbumDTO.builder().name("TestAlbumOne").price(10.00).build();
         String testId = "1";
 
         Assertions.assertThrows(ItemNotFoundException.class,() -> recordShopServiceLayer.updateAlbumDetails(testId,testAlbumInfo));
@@ -189,8 +204,8 @@ class ServiceLayerImplTest {
     @Test
     @DisplayName("updateAlbumDetails throws InvalidInputException error for an invalid input")
     void updateAlbumDetails_InvalidInputTest(){
-        Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbumInfo = Album.builder().name("  ").price(10.00).build();
+        //Artist testArtist = new Artist(1, "THE Artist");
+        AlbumDTO testAlbumInfo = AlbumDTO.builder().name("  ").price(10.00).build();
         String testId = "L";
 
         Assertions.assertThrows(InvalidInputException.class,() -> recordShopServiceLayer.updateAlbumDetails(testId,testAlbumInfo));

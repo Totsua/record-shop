@@ -2,6 +2,8 @@ package com.northcoders.jv_record_shop.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.northcoders.jv_record_shop.dto.AlbumDTO;
+import com.northcoders.jv_record_shop.dto.ArtistDTO;
 import com.northcoders.jv_record_shop.exception.APIExceptionHandler;
 import com.northcoders.jv_record_shop.exception.InvalidInputException;
 import com.northcoders.jv_record_shop.exception.ItemNotFoundException;
@@ -56,22 +58,22 @@ class RecordShopControllerTests {
     @Test
     @DisplayName("GET all the albums in the database")
     void getAllAlbums_Test() throws Exception {
-        Artist testArtist = new Artist(1L, "THE Artist");
+        ArtistDTO testArtist = new ArtistDTO(1L, "THE Artist");
 
-        Album testAlbum1 = new Album(1L, "testOne", testArtist, Genre.JAZZ.toString(),
+        AlbumDTO testAlbum1 = new AlbumDTO(1L, "testOne", testArtist, Genre.JAZZ.toString(),
                 LocalDate.of(2024, 12, 5), 5, 10.50);
-        Album testAlbum2 = new Album(2L, "testTwo", testArtist, Genre.POP.toString(),
+        AlbumDTO testAlbum2 = new AlbumDTO(2L, "testTwo", testArtist, Genre.POP.toString(),
                 LocalDate.of(2024, 12, 5), 2, 12.12);
-        Album testAlbum3 = new Album(3L, "testThree", testArtist, Genre.UNKNOWN.toString(),
+        AlbumDTO testAlbum3 = new AlbumDTO(3L, "testThree", testArtist, Genre.UNKNOWN.toString(),
                 LocalDate.of(2024, 12, 5), 9, 5.0);
 
-        List<Album> albumList = List.of(testAlbum1, testAlbum2, testAlbum3);
+        List<AlbumDTO> albumList = List.of(testAlbum1, testAlbum2, testAlbum3);
 
         Mockito.when(mockRecordShopServiceImpl.getAllAlbums()).thenReturn(albumList);
 
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.get("/api/v1/recordshop"))
+                        MockMvcRequestBuilders.get("/api/v1/recordshop/albums"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value(1L))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("testOne"))
@@ -85,8 +87,8 @@ class RecordShopControllerTests {
     @Test
     @DisplayName("Get Album by the id given a valid id")
     void getAlbumById_ValidIdTest() throws Exception {
-        Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbum = new Album(1, "testOne", testArtist, Genre.JAZZ.toString(),
+        ArtistDTO testArtist = new ArtistDTO(1, "THE Artist");
+        AlbumDTO testAlbum = new AlbumDTO(1, "testOne", testArtist, Genre.JAZZ.toString(),
                 LocalDate.of(2000, 10, 10), 5, 10.50);
 
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("1")).thenReturn(testAlbum);
@@ -124,9 +126,9 @@ class RecordShopControllerTests {
 
     // Set up an Answer object that will set the id of an Album after the Service call for adding an Album
     @Before("addAlbum_ValidTest")
-    Answer<Album> setUpAnswer() {
+    Answer<AlbumDTO> setUpAnswer() {
         return invocationOnMock -> {
-            Album album = invocationOnMock.getArgument(0, Album.class);
+            AlbumDTO album = invocationOnMock.getArgument(0, AlbumDTO.class);
             album.setId(1);
             return album;
         };
@@ -137,8 +139,8 @@ class RecordShopControllerTests {
     void addAlbum_ValidTest() throws Exception {
 
         // Assigning Artist and Album objects
-        Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbum = Album.builder()
+        ArtistDTO testArtist = new ArtistDTO(1, "THE Artist");
+        AlbumDTO testAlbum = AlbumDTO.builder()
                 .name("TestAlbumOne")
                 .genre(Genre.RAP.toString())
                 .stock(131)
@@ -189,8 +191,8 @@ class RecordShopControllerTests {
     void addAlbum_WithAnIdTest() throws Exception {
 
         // Assigning Artist and Album objects
-        Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbum = Album.builder()
+        ArtistDTO testArtist = new ArtistDTO(1, "THE Artist");
+        AlbumDTO testAlbum = AlbumDTO.builder()
                 .id(10)
                 .name("TestAlbumOne")
                 .genre(Genre.UNKNOWN.toString())
@@ -222,12 +224,12 @@ class RecordShopControllerTests {
     @DisplayName("updateAlbumDetails returns the updated Album when given valid input and id")
     void updateAlbumDetails_ValidInputs() throws Exception {
 
-        Album testAlbumUpdated = Album.builder().id(3).stock(3).price(5.0).build();
+        AlbumDTO testAlbumUpdated = AlbumDTO.builder().id(3).stock(3).price(5.0).build();
 
         String testJSON = mapper.writeValueAsString(testAlbumUpdated);
 
-        Artist testArtist = new Artist(1, "THE Artist");
-        Album testAlbum = Album.builder().id(3)
+        ArtistDTO testArtist = new ArtistDTO(1, "THE Artist");
+        AlbumDTO testAlbum = AlbumDTO.builder().id(3)
                 .name("TestAlbumOne")
                 .artist(testArtist)
                 .genre(Genre.HIPHOP.toString())
@@ -251,7 +253,7 @@ class RecordShopControllerTests {
     @DisplayName("updateAlbumDetails returns error 404 for an valid id with no Album associated with the id")
     void updateAlbumDetails_ValidIdNoAlbum() throws Exception {
 
-        Album testAlbumUpdated = Album.builder().id(3).stock(3).price(5.0).build();
+        AlbumDTO testAlbumUpdated = AlbumDTO.builder().id(3).stock(3).price(5.0).build();
 
         String testJSON = mapper.writeValueAsString(testAlbumUpdated);
 
@@ -270,7 +272,7 @@ class RecordShopControllerTests {
     void updateAlbumDetails_ValidIdInvalidInputTest() throws Exception {
 
         String testJSON = "{\"name\":\"\"}";
-        Album testAlbum = Album.builder().name("").build();
+        AlbumDTO testAlbum = AlbumDTO.builder().name("").build();
 
 
         Mockito.when(mockRecordShopServiceImpl.updateAlbumDetails("1",testAlbum))

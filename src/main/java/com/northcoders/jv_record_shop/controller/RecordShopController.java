@@ -1,5 +1,6 @@
 package com.northcoders.jv_record_shop.controller;
 
+import com.northcoders.jv_record_shop.dto.AlbumDTO;
 import com.northcoders.jv_record_shop.model.Album;
 import com.northcoders.jv_record_shop.service.RecordShopServiceLayer;
 import jakarta.validation.Valid;
@@ -17,23 +18,23 @@ public class RecordShopController {
     @Autowired
     RecordShopServiceLayer recordShopService;
 
-    @GetMapping
-    public ResponseEntity<List<Album>> getAllAlbums(){
+    @GetMapping("")
+    public ResponseEntity<List<AlbumDTO>> getAllAlbums(){
         return new ResponseEntity<>(recordShopService.getAllAlbums(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Album> getAlbumById(@PathVariable String id){
+    public ResponseEntity<AlbumDTO> getAlbumById(@PathVariable String id){
         return new ResponseEntity<>(recordShopService.getAlbumById(id),HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Album> addAlbum(@RequestBody @Valid Album album){
+    public ResponseEntity<AlbumDTO> addAlbum(@RequestBody @Valid AlbumDTO album){
         return new ResponseEntity<>(recordShopService.addAlbum(album),HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Album> updateAlbumDetails(@PathVariable String id, @RequestBody  Album album){
+    public ResponseEntity<AlbumDTO> updateAlbumDetails(@PathVariable String id, @RequestBody  AlbumDTO album){
         return new ResponseEntity<>(recordShopService.updateAlbumDetails(id,album),HttpStatus.OK);
     }
 

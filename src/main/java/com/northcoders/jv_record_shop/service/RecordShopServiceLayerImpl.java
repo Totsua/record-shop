@@ -52,7 +52,6 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
         albumInput.setId(0); // Set to 0 in case the user inputs an id
 
         Album album = mapDTOToAlbum(albumInput);
-        System.out.println(album);
         if(artistRepository.existsById(album.getArtist().getId())){
             album.setArtist(artistRepository.findById(album.getArtist().getId()).get());
             System.out.println(album);

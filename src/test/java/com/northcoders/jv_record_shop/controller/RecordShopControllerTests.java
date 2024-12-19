@@ -94,7 +94,7 @@ class RecordShopControllerTests {
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("1")).thenReturn(testAlbum);
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.get("/api/v1/recordshop/1"))
+                        MockMvcRequestBuilders.get("/api/v1/recordshop/albums/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("JAZZ"))
@@ -109,7 +109,7 @@ class RecordShopControllerTests {
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("B"))
                 .thenThrow(new InvalidInputException("B is not a valid Id"));
 
-        this.mockMvcController.perform(MockMvcRequestBuilders.get("/api/v1/recordshop/B"))
+        this.mockMvcController.perform(MockMvcRequestBuilders.get("/api/v1/recordshop/albums/B"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -120,7 +120,7 @@ class RecordShopControllerTests {
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("1"))
                 .thenThrow(new ItemNotFoundException("There is no Album with id 1"));
 
-        this.mockMvcController.perform(MockMvcRequestBuilders.get("/api/v1/recordshop/1"))
+        this.mockMvcController.perform(MockMvcRequestBuilders.get("/api/v1/recordshop/albums/1"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
@@ -157,7 +157,7 @@ class RecordShopControllerTests {
 
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.post("/api/v1/recordshop")
+                        MockMvcRequestBuilders.post("/api/v1/recordshop/albums/create")
                                 .contentType(MediaType.APPLICATION_JSON).content(testJSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
@@ -174,7 +174,7 @@ class RecordShopControllerTests {
 
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.post("/api/v1/recordshop")
+                        MockMvcRequestBuilders.post("/api/v1/recordshop/albums/create")
                                 .contentType(MediaType.APPLICATION_JSON).content(testJSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("name cannot be blank"))
@@ -211,7 +211,7 @@ class RecordShopControllerTests {
 
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.post("/api/v1/recordshop")
+                        MockMvcRequestBuilders.post("/api/v1/recordshop/albums/create")
                                 .contentType(MediaType.APPLICATION_JSON).content(testJSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
@@ -240,7 +240,7 @@ class RecordShopControllerTests {
         Mockito.when(mockRecordShopServiceImpl.updateAlbumDetails("3", testAlbumUpdated)).thenReturn(testAlbum);
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.patch("/api/v1/recordshop/3")
+                        MockMvcRequestBuilders.patch("/api/v1/recordshop/albums/3")
                                 .contentType(MediaType.APPLICATION_JSON).content(testJSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("3"))
@@ -262,7 +262,7 @@ class RecordShopControllerTests {
                 .thenThrow(ItemNotFoundException.class);
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.patch("/api/v1/recordshop/3")
+                        MockMvcRequestBuilders.patch("/api/v1/recordshop/albums/3")
                                 .contentType(MediaType.APPLICATION_JSON).content(testJSON))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 
@@ -279,7 +279,7 @@ class RecordShopControllerTests {
                 .thenThrow(new InvalidInputException("name cannot be blank"));
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.patch("/api/v1/recordshop/1")
+                        MockMvcRequestBuilders.patch("/api/v1/recordshop/albums/1")
                                 .contentType(MediaType.APPLICATION_JSON).content(testJSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
@@ -290,7 +290,7 @@ class RecordShopControllerTests {
         String testJSON = "{\"id\":\"B\"}";
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.patch("/api/v1/recordshop/B"))
+                        MockMvcRequestBuilders.patch("/api/v1/recordshop/albums/B"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -301,7 +301,7 @@ class RecordShopControllerTests {
     void deleteAlbumByID_ValidId() throws Exception{
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.delete("/api/v1/recordshop/1"))
+                        MockMvcRequestBuilders.delete("/api/v1/recordshop/albums/1"))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
     }
@@ -312,7 +312,7 @@ class RecordShopControllerTests {
         Mockito.doThrow(new ItemNotFoundException("There is no album with id 1")).when(mockRecordShopServiceImpl).deleteAlbumById("1");
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.delete("/api/v1/recordshop/1"))
+                        MockMvcRequestBuilders.delete("/api/v1/recordshop/albums/1"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
@@ -323,7 +323,7 @@ class RecordShopControllerTests {
         Mockito.doThrow(new InvalidInputException("B is not a valid id")).when(mockRecordShopServiceImpl).deleteAlbumById("B");
 
         this.mockMvcController.perform(
-                        MockMvcRequestBuilders.delete("/api/v1/recordshop/B"))
+                        MockMvcRequestBuilders.delete("/api/v1/recordshop/albums/B"))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 

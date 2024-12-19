@@ -18,27 +18,27 @@ public class RecordShopController {
     @Autowired
     RecordShopServiceLayer recordShopService;
 
-    @GetMapping("")
+    @GetMapping("/albums")
     public ResponseEntity<List<AlbumDTO>> getAllAlbums(){
         return new ResponseEntity<>(recordShopService.getAllAlbums(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/albums/{id}")
     public ResponseEntity<AlbumDTO> getAlbumById(@PathVariable String id){
         return new ResponseEntity<>(recordShopService.getAlbumById(id),HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/albums/create")
     public ResponseEntity<AlbumDTO> addAlbum(@RequestBody @Valid AlbumDTO album){
         return new ResponseEntity<>(recordShopService.addAlbum(album),HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("albums/{id}")
     public ResponseEntity<AlbumDTO> updateAlbumDetails(@PathVariable String id, @RequestBody  AlbumDTO album){
         return new ResponseEntity<>(recordShopService.updateAlbumDetails(id,album),HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("albums/{id}")
     public ResponseEntity<Album> deleteAlbumByID(@PathVariable String id){
         recordShopService.deleteAlbumById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

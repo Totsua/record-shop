@@ -40,7 +40,6 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
         Optional<Album> potentialAlbum = recordShopRepository.findById(longId);
         if(potentialAlbum.isPresent()){
             return mapAlbumToDTO(potentialAlbum.get());
-            //return potentialAlbum.get();
         }
         else{
             throw new ItemNotFoundException("No album with id " + id);
@@ -124,7 +123,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
     }
 
     private AlbumDTO mapAlbumToDTO(Album album){
-        System.out.println(album);
+
         return AlbumDTO.builder()
                 .id(album.getId())
                 .name(album.getName())

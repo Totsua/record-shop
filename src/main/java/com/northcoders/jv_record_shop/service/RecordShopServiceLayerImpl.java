@@ -49,19 +49,16 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
 
     @Override
     public AlbumDTO addAlbum(AlbumDTO albumInput) {
-        albumInput.setId(0); // Set to 0 in case the user inputs an id
-
+        // Album and Artist id's must be set to 0 to ensure that a detached entity error won't occur
+        albumInput.setId(0);
+        albumInput.getArtist().setId(0);
         Album album = mapDTOToAlbum(albumInput);
-        if(artistRepository.existsById(album.getArtist().getId())){
-            album.setArtist(artistRepository.findById(album.getArtist().getId()).get());
-            System.out.println(album);
-        }else{
-            album.getArtist().setId(0); // Set to 0 in case the user inputs an artist id that's not in the database
-        }
+
+        Optional<Artist> artist = artistRepository.findByName(album.getArtist().getName());
+        artist.ifPresent(album::setArtist);
 
         Album albumDTO = recordShopRepository.save(album);
         return mapAlbumToDTO(albumDTO);
-
     }
 
     @Override

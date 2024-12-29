@@ -33,7 +33,7 @@ public class Album {
     String name;
 
     @JoinColumn
-    @ManyToOne(cascade = CascadeType.ALL,optional = false)
+    @ManyToOne(cascade = CascadeType.PERSIST,optional = false)
     @NotNull(message = "An artist must be included")
     @Valid
     Artist artist;

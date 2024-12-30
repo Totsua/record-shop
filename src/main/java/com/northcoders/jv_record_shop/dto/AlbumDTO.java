@@ -32,11 +32,10 @@ public class AlbumDTO {
     @GenreValidator(enumClass = Genre.class)
     String genre;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    @NotNull(message = "releaseDate must contain an entry in format \"dd-MM-yyyy\"")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "releaseDate must contain an entry in format 'dd-MM-yyyy'")
     LocalDate releaseDate;
 
-    //@NotBlank(message = "stock cannot be blank")
     @NotNull(message = "stock cannot be empty")
     @Range(min=0,message = "stock cannot be negative")
     Integer stock;

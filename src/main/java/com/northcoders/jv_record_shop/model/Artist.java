@@ -22,4 +22,11 @@ public class Artist {
     @Column (nullable = false)
     String name;
 
+
+    /* todo:
+        Make the artists keep track of all their albums
+        @OneToMany(mappedBy = "artist")
+        List<Album> albums;
+    */
+
 }

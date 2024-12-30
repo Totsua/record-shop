@@ -81,7 +81,7 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].genre").value("POP"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].artist.name").value("THE Artist"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[2].price").value("5.0"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[2].releaseDate").value("05-12-2024"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$[2].releaseDate").value("2024-12-05"));
     }
 
     @Test
@@ -98,7 +98,7 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("JAZZ"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("10-10-2000"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("2000-10-10"));
     }
 
 
@@ -162,7 +162,7 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("RAP"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("05-12-2024"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("2024-12-05"));
     }
 
     @Test
@@ -181,7 +181,7 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("must be any of Genre {ROCK,HIPHOP,RAP,JAZZ,POP,UNKNOWN}"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.stock").value("stock cannot be negative"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.price").value("price cannot be negative because we aren't paying people to take the album"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("releaseDate must contain an entry in format \"dd-MM-yyyy\""))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("releaseDate must contain an entry in format 'dd-MM-yyyy'"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$['artist.name']").value("An artist's name must not be empty"));
     }
 
@@ -216,7 +216,7 @@ class RecordShopControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.genre").value("UNKNOWN"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("06-12-2020"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value("2020-12-06"));
     }
 
 

@@ -132,9 +132,9 @@ class ServiceLayerImplTest {
                 .releaseDate(LocalDate.of(2024, 12, 5))
                 .build();
 
-        Mockito.when(artistRepository.existsById(testArtist.getId())).thenReturn(true);
+        Mockito.when(artistRepository.findByName(testArtist.getName())).thenReturn(Optional.of(testArtist));
         Mockito.when(mockRecordShopRepository.save(testAlbum)).thenAnswer(setUpAnswer());
-        Mockito.when(artistRepository.findById(testArtist.getId())).thenReturn(Optional.of(testArtist));
+        Mockito.when(artistRepository.findById(0L)).thenReturn(Optional.of(testArtist));
 
 
         AlbumDTO result = recordShopServiceLayer.addAlbum(testAlbumDTO);

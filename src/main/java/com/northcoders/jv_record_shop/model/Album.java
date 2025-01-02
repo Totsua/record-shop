@@ -39,4 +39,7 @@ public class Album {
     @Column(nullable = false,precision = 2)
     Double price;
 
+    @Column
+    String url;
+
 }

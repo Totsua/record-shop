@@ -21,6 +21,9 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
     RecordShopRepository recordShopRepository;
     @Autowired
     ArtistRepository artistRepository;
+    @Autowired
+    AlbumCoverAPIServiceLayer albumCoverAPIServiceLayer;
+
 
     @Override
     public List<AlbumDTO> getAllAlbums() {
@@ -55,6 +58,9 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
 
         Optional<Artist> artist = artistRepository.findByName(album.getArtist().getName());
         artist.ifPresent(album::setArtist);
+
+        String albumCoverURL = albumCoverAPIServiceLayer.findAlbumCoverURL(album.getName());
+        album.setUrl(albumCoverURL);
 
         Album albumDTO = recordShopRepository.save(album);
         return mapAlbumToDTO(albumDTO);
@@ -132,6 +138,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
                 .releaseDate(album.getReleaseDate())
                 .price(album.getPrice())
                 .stock(album.getStock())
+                .url(album.getUrl())
                 .build();
     }
 
@@ -151,6 +158,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
                 .releaseDate(albumDTO.getReleaseDate())
                 .price(albumDTO.getPrice())
                 .stock(albumDTO.getStock())
+                .url(albumDTO.getUrl())
                 .build();
     }
 

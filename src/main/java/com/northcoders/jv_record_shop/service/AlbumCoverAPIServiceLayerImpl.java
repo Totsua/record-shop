@@ -1,6 +1,8 @@
 package com.northcoders.jv_record_shop.service;
 
-import com.northcoders.jv_record_shop.model.Album;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,7 +15,7 @@ import java.net.http.HttpResponse;
 public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
     @Override
     public String findAlbumCoverURL(String albumName) {
-        return null;
+        return collectUrlFromApiResponseBody(apiCaller(albumName));
     }
 
 
@@ -39,5 +41,34 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
         }
 
     };
+
+    /**
+     * Method to find the URL from the response from the API request
+     * @param response the response body from the API
+     * @return the URL obtained from the response body, if none are found then "Default" is returned
+     */
+    private String collectUrlFromApiResponseBody(String response){
+        ObjectMapper mapper = new ObjectMapper();
+
+        if(response.equals("Default")){
+            return response;
+        }
+
+        try{
+            JsonNode root = mapper.readTree(response);
+            JsonNode results = root.get("results");
+
+            if(results.isEmpty()){
+                return "Default";
+            }
+
+            // get the first result
+            return results.get(0).get("artworkUrl100").asText();
+
+        } catch (JsonProcessingException e) {
+           return "Default";
+        }
+
+    }
 
 }

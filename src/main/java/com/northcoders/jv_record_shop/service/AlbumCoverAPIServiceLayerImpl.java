@@ -27,7 +27,7 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
     private String apiCaller(String albumName){
         HttpClient client = HttpClient.newBuilder().build();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://itunes.apple.com/search?term="+albumName+"&entity=album"))
+                .uri(URI.create("https://itunes.apple.com/search?term="+albumName.replace(" ","+")+"&entity=album"))
                 .GET()
                 .build();
 

@@ -101,6 +101,10 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
             if(albumUpdateInfo.getPrice() != null){
                 albumInDb.setPrice(albumUpdateInfo.getPrice());
             }
+
+
+            // todo:
+            //  Be able to update the url of an Album
             return mapAlbumToDTO(recordShopRepository.save(albumInDb));
 
 

@@ -61,11 +61,11 @@ class RecordShopControllerTests {
         ArtistDTO testArtist = new ArtistDTO(1L, "THE Artist");
 
         AlbumDTO testAlbum1 = new AlbumDTO(1L, "testOne", testArtist, Genre.JAZZ.toString(),
-                LocalDate.of(2024, 12, 5), 5, 10.50);
+                LocalDate.of(2024, 12, 5), 5, 10.50,"");
         AlbumDTO testAlbum2 = new AlbumDTO(2L, "testTwo", testArtist, Genre.POP.toString(),
-                LocalDate.of(2024, 12, 5), 2, 12.12);
+                LocalDate.of(2024, 12, 5), 2, 12.12,"");
         AlbumDTO testAlbum3 = new AlbumDTO(3L, "testThree", testArtist, Genre.UNKNOWN.toString(),
-                LocalDate.of(2024, 12, 5), 9, 5.0);
+                LocalDate.of(2024, 12, 5), 9, 5.0,"");
 
         List<AlbumDTO> albumList = List.of(testAlbum1, testAlbum2, testAlbum3);
 
@@ -89,7 +89,7 @@ class RecordShopControllerTests {
     void getAlbumById_ValidIdTest() throws Exception {
         ArtistDTO testArtist = new ArtistDTO(1, "THE Artist");
         AlbumDTO testAlbum = new AlbumDTO(1, "testOne", testArtist, Genre.JAZZ.toString(),
-                LocalDate.of(2000, 10, 10), 5, 10.50);
+                LocalDate.of(2000, 10, 10), 5, 10.50,"");
 
         Mockito.when(mockRecordShopServiceImpl.getAlbumById("1")).thenReturn(testAlbum);
 

@@ -33,6 +33,9 @@ class ServiceLayerImplTest {
     @Mock
     private ArtistRepository artistRepository;
 
+    @Mock
+    private AlbumCoverAPIServiceLayerImpl albumCoverAPIServiceLayer;
+
     @InjectMocks
     private RecordShopServiceLayerImpl recordShopServiceLayer;
 
@@ -43,11 +46,11 @@ class ServiceLayerImplTest {
         List<Album> albumList = new ArrayList<>();
         Artist testArtist = new Artist(1L, "THE Artist");
         Album testAlbum1 = new Album(1L, "testOne", testArtist, Genre.JAZZ.toString(),
-                LocalDate.of(2024, 12, 5), 5, 10.50);
+                LocalDate.of(2024, 12, 5), 5, 10.50,"");
         Album testAlbum2 = new Album(2L, "testTwo", testArtist, Genre.POP.toString(),
-                LocalDate.of(2024, 12, 5), 2, 12.12);
+                LocalDate.of(2024, 12, 5), 2, 12.12,"");
         Album testAlbum3 = new Album(3L, "testThree", testArtist, Genre.UNKNOWN.toString(),
-                LocalDate.of(2024, 12, 5), 9, 5.0);
+                LocalDate.of(2024, 12, 5), 9, 5.0,"");
 
         albumList.add(testAlbum1);
         albumList.add(testAlbum2);
@@ -69,7 +72,7 @@ class ServiceLayerImplTest {
     void getAlbumById_ValidIdTest(){
         Artist testArtist = new Artist(1, "THE Artist");
         Album testAlbum = new Album(1, "testOne", testArtist, Genre.JAZZ.toString(),
-                LocalDate.of(2024, 12, 5), 5, 10.50);
+                LocalDate.of(2024, 12, 5), 5, 10.50,"");
 
         String testId = "1";
         Mockito.when(mockRecordShopRepository.findById(1L)).thenReturn(Optional.of((testAlbum)));
@@ -145,14 +148,6 @@ class ServiceLayerImplTest {
         );
     }
 
-
-    @Test
-    @DisplayName("addAlbum assigns an artist with the same name if given an artist without id")
-    void addAlbum_NoIdArtist(){
-    }
-
-
-
     @Test
     @DisplayName("updateAlbumDetails returns the modified album with valid Id and inputs")
     void updateAlbumDetails_ValidIdInputsTest(){
@@ -195,7 +190,6 @@ class ServiceLayerImplTest {
     @Test
     @DisplayName("updateAlbumDetails throws ItemNotFoundException for a valid id with no associated album in database ")
     void updateAlbumDetails_ValidIdNoAlbumTest(){
-       // Artist testArtist = new Artist(1, "THE Artist");
         AlbumDTO testAlbumInfo = AlbumDTO.builder().name("TestAlbumOne").price(10.00).build();
         String testId = "1";
 

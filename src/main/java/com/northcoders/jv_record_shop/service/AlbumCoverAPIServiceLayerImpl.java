@@ -14,8 +14,8 @@ import java.net.http.HttpResponse;
 @Service
 public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
     @Override
-    public String findAlbumCoverURL(String albumName) {
-        return collectUrlFromApiResponseBody(apiCaller(albumName));
+    public String findAlbumCoverURL(String albumName, String artistName) {
+        return collectUrlFromApiResponseBody(apiCaller(albumName), artistName);
     }
 
 
@@ -47,8 +47,11 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
      * @param response the response body from the API
      * @return the URL obtained from the response body, if none are found then "Default" is returned
      */
-    private String collectUrlFromApiResponseBody(String response){
+    private String collectUrlFromApiResponseBody(String response, String artistName){
         ObjectMapper mapper = new ObjectMapper();
+
+        boolean isNameTheSame;
+        boolean isArtistTheSame;
 
         if(response.equals("Default")){
             return response;
@@ -60,6 +63,12 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
 
             if(results.isEmpty()){
                 return "Default";
+            }
+
+            for(JsonNode node : results ){
+                if(node.get("artistName").asText().equalsIgnoreCase(artistName)){
+                    return node.get("artworkUrl100").asText();
+                }
             }
 
             // get the first result

@@ -59,7 +59,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
         Optional<Artist> artist = artistRepository.findByName(album.getArtist().getName());
         artist.ifPresent(album::setArtist);
 
-        String albumCoverURL = albumCoverAPIServiceLayer.findAlbumCoverURL(album.getName());
+        String albumCoverURL = albumCoverAPIServiceLayer.findAlbumCoverURL(album.getName(), album.getArtist().getName());
         album.setUrl(albumCoverURL);
 
         Album albumDTO = recordShopRepository.save(album);

@@ -1,9 +1,7 @@
 package com.northcoders.jv_record_shop.service;
 
 import com.northcoders.jv_record_shop.dto.AlbumDTO;
-import com.northcoders.jv_record_shop.model.Album;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 

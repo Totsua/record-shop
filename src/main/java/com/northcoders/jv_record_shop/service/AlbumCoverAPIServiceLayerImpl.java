@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 
 @Service
 public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
@@ -52,6 +53,8 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
     private String collectIdFromApiResponseBody(String response, String artistName){
         ObjectMapper mapper = new ObjectMapper();
 
+        ArrayList<String> resultsArray = new ArrayList<>();
+
         if(response.equals("Default")){
             return response;
         }
@@ -61,9 +64,10 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
             JsonNode results = root.get("releases");
 
 
-            if(results.isEmpty()){
+            if(results == null || results.isEmpty()){
                 return "Default";
             }
+
 
             for(JsonNode node : results ){
                 JsonNode artistCredNodePath = node.path("artist-credit");
@@ -73,47 +77,66 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
                 if(artistNameJson.equalsIgnoreCase( "\""+artistName+ "\"")){
 
                     String id = node.get("id").asText();
-                    /*System.out.println(id);*/
-                    return getCoverArtURL(id);
+
+                    resultsArray.add(id);
                 }
 
+
             }
-            return "Default";
+            if(!resultsArray.isEmpty()) {
+                return getCoverArtURL(resultsArray);
+            }
 
         } catch (JsonProcessingException e) {
             return "Default";
         }
 
+        return "Default";
     }
+
+
+    /*
+    Make initial API call and take all nodes that contain the artists name
+    Send the node array to the next method and the first one that returns an image is used
+     */
 
 
     /**
      * Method to obtain the set of cover art urls from the Cover art archive API
-     * @param id the MusicBrainz API id of the album
+     * @param results the arraylist of Musicbrainz API id's of the album
      * @return the image url of the cover art, if none found "Default" is returned
      */
 
-    private String getCoverArtURL(String id){
+    private String getCoverArtURL(/*String id*/ ArrayList<String> results){
         // .followRedirects needed because the cover art archive api sends a redirect for an initial response
-        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
+        String result;
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://coverartarchive.org/release/" + id+ "?fmt=json"))
-                .header("Accept","application/json")
-                .GET()
-                .build();
+        for(int i = 0; i < results.size(); i++ ) {
+            HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
 
-        String responseBody;
-        try{
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            responseBody = response.body();
-            return extractURL(responseBody);
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://coverartarchive.org/release/" + results.get(i) + "?fmt=json"))
+                    .header("Accept", "application/json")
+                    .GET()
+                    .build();
 
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Problem with the obtaining a response from the URL");
-            e.printStackTrace();
-            return "Default";
+            String responseBody;
+            try {
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                responseBody = response.body();
+                result = extractURL(responseBody);
+
+            } catch (IOException | InterruptedException e) {
+                System.out.println("Problem with the obtaining a response from the URL");
+                e.printStackTrace();
+                return "Default";
+            }
+
+            if(result != null & !result.equals("Default")){
+                return result;
+            }
         }
+        return "Default";
 
     }
 
@@ -125,8 +148,9 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
 
     private String extractURL(String response){
         ObjectMapper mapper = new ObjectMapper();
-
+        System.out.println(response);
         try{
+
             JsonNode results = mapper.readTree(response);
             JsonNode images = results.get("images");
             JsonNode imageNode = images.get(0);
@@ -139,6 +163,8 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
             return "Default";
 
         } catch (JsonProcessingException e) {
+            System.out.println("Problem obtaining extracting image URL");
+            System.out.println(response);
             e.printStackTrace();
             return "Default";
         }

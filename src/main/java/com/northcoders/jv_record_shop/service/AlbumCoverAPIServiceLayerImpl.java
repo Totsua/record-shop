@@ -15,19 +15,21 @@ import java.net.http.HttpResponse;
 public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
     @Override
     public String findAlbumCoverURL(String albumName, String artistName) {
-        return collectUrlFromApiResponseBody(apiCaller(albumName), artistName);
+        return collectIdFromApiResponseBody(musicbrainzApiCaller(albumName), artistName);
     }
 
 
     /**
-     * Method to make a request to the itunes API to get the URL of the album being queried
+     * Method to make a request to the Musicbrainz API to get the URL of the album being queried
      * @param albumName name of the album being searched
      * @return the response body from the API
      */
-    private String apiCaller(String albumName){
+
+    private String musicbrainzApiCaller(String albumName){
         HttpClient client = HttpClient.newBuilder().build();
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://itunes.apple.com/search?term="+albumName.replace(" ","+")+"&entity=album"))
+                .uri(URI.create("https://musicbrainz.org/ws/2/release?query="+albumName.replace(" ","+")+"&fmt=json"))
                 .GET()
                 .build();
 
@@ -43,15 +45,12 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
     };
 
     /**
-     * Method to find the URL from the response from the API request
+     * Method to find the Musicbrainz id of the correct album from the response body from the Musicbrainz api call
      * @param response the response body from the API
-     * @return the URL obtained from the response body, if none are found then "Default" is returned
+     * @return the method call of getCoverArtURL using the Musicbrainz id,  if none are found then "Default" is returned
      */
-    private String collectUrlFromApiResponseBody(String response, String artistName){
+    private String collectIdFromApiResponseBody(String response, String artistName){
         ObjectMapper mapper = new ObjectMapper();
-
-        boolean isNameTheSame;
-        boolean isArtistTheSame;
 
         if(response.equals("Default")){
             return response;
@@ -59,23 +58,89 @@ public class AlbumCoverAPIServiceLayerImpl implements AlbumCoverAPIServiceLayer{
 
         try{
             JsonNode root = mapper.readTree(response);
-            JsonNode results = root.get("results");
+            JsonNode results = root.get("releases");
+
 
             if(results.isEmpty()){
                 return "Default";
             }
 
             for(JsonNode node : results ){
-                if(node.get("artistName").asText().equalsIgnoreCase(artistName)){
-                    return node.get("artworkUrl100").asText();
-                }
-            }
+                JsonNode artistCredNodePath = node.path("artist-credit");
+                JsonNode artistDetails = artistCredNodePath.get(0);
+                String artistNameJson = artistDetails.get("name").toString();
 
-            // get the first result
-            return results.get(0).get("artworkUrl100").asText();
+                if(artistNameJson.equalsIgnoreCase( "\""+artistName+ "\"")){
+
+                    String id = node.get("id").asText();
+                    /*System.out.println(id);*/
+                    return getCoverArtURL(id);
+                }
+
+            }
+            return "Default";
 
         } catch (JsonProcessingException e) {
-           return "Default";
+            return "Default";
+        }
+
+    }
+
+
+    /**
+     * Method to obtain the set of cover art urls from the Cover art archive API
+     * @param id the MusicBrainz API id of the album
+     * @return the image url of the cover art, if none found "Default" is returned
+     */
+
+    private String getCoverArtURL(String id){
+        // .followRedirects needed because the cover art archive api sends a redirect for an initial response
+        HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://coverartarchive.org/release/" + id+ "?fmt=json"))
+                .header("Accept","application/json")
+                .GET()
+                .build();
+
+        String responseBody;
+        try{
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            responseBody = response.body();
+            return extractURL(responseBody);
+
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Problem with the obtaining a response from the URL");
+            e.printStackTrace();
+            return "Default";
+        }
+
+    }
+
+    /**
+     * Method to obtain the image url from the Cover Art Archive API response body
+     * @param response the response body of the Cover Art Archive API
+     * @return the url of the cover art, if none found "Default" is returned
+     */
+
+    private String extractURL(String response){
+        ObjectMapper mapper = new ObjectMapper();
+
+        try{
+            JsonNode results = mapper.readTree(response);
+            JsonNode images = results.get("images");
+            JsonNode imageNode = images.get(0);
+
+            if(imageNode.get("image")!= null){
+                // Url is obtained with speech marks, those need to be removed
+                return imageNode.get("image").toString().split("\"")[1];
+            }
+
+            return "Default";
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return "Default";
         }
 
     }

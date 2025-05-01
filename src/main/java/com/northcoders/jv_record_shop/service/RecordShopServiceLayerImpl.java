@@ -62,6 +62,10 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
         String albumCoverURL = albumCoverAPIServiceLayer.findAlbumCoverURL(album.getName(), album.getArtist().getName());
         album.setUrl(albumCoverURL);
 
+        if(album.getIsFavourite() == null){
+            album.setIsFavourite(false);
+        }
+
         Album albumDTO = recordShopRepository.save(album);
         return mapAlbumToDTO(albumDTO);
     }
@@ -101,7 +105,9 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
             if(albumUpdateInfo.getPrice() != null){
                 albumInDb.setPrice(albumUpdateInfo.getPrice());
             }
-
+            if(albumUpdateInfo.getIsFavourite() != null){
+                albumInDb.setIsFavourite(albumUpdateInfo.getIsFavourite());
+            }
 
             // todo:
             //  Be able to update the url of an Album
@@ -143,6 +149,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
                 .price(album.getPrice())
                 .stock(album.getStock())
                 .url(album.getUrl())
+                .isFavourite(album.getIsFavourite())
                 .build();
     }
 
@@ -163,6 +170,7 @@ public class RecordShopServiceLayerImpl implements RecordShopServiceLayer {
                 .price(albumDTO.getPrice())
                 .stock(albumDTO.getStock())
                 .url(albumDTO.getUrl())
+                .isFavourite(albumDTO.getIsFavourite())
                 .build();
     }
 

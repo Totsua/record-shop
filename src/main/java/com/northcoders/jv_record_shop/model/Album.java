@@ -42,4 +42,6 @@ public class Album {
     @Column
     String url;
 
+    @Column(nullable = false)
+    Boolean isFavourite;
 }

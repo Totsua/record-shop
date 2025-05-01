@@ -44,5 +44,7 @@ public class AlbumDTO {
     @Range(min=0,message = "price cannot be negative because we aren't paying people to take the album")
     Double price;
 
+    Boolean isFavourite;
+
     String url;
 }
